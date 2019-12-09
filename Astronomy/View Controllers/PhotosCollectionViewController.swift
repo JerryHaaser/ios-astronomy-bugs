@@ -28,23 +28,44 @@ class PhotosCollectionViewController: UIViewController, UICollectionViewDataSour
     
     @IBAction func goToPreviousSol(_ sender: Any?) {
         guard let solDescriptions = roverInfo?.solDescriptions else { return }
-        guard let sol = solDescription?.sol, sol > 0 else {
-            solDescription = solDescriptions.first
-            return
+        
+        guard let description = solDescription,
+            let index = solDescriptions.firstIndex(of: description),
+            description.sol > 0 else {
+                solDescription = solDescriptions.last
+                return
         }
         
-        solDescription = solDescriptions[sol-1]
+        solDescription = solDescriptions[index - 1]
+        
+//        guard let sol = solDescription?.sol, sol > 0 else {
+//            solDescription = solDescriptions.first
+//            return
+//        }
+//
+//        solDescription = solDescriptions[sol-1]
     }
     
     @IBAction func goToNextSol(_ sender: Any?) {
         guard let solDescriptions = roverInfo?.solDescriptions else { return }
-        guard let sol = solDescription?.sol, sol < solDescriptions.count else {
-            solDescription = solDescriptions.last
-            return
+        
+        guard let description = solDescription,
+            let index = solDescriptions.firstIndex(of: description),
+            description.sol < solDescriptions.count - 1 else {
+                solDescription = solDescriptions.first
+                return
         }
         
-        solDescription = solDescriptions[sol+1]
+        solDescription = solDescriptions[index + 1]
     }
+        
+//        guard let sol = solDescription?.sol, sol < solDescriptions.count else {
+//            solDescription = solDescriptions.last
+//            return
+//        }
+//
+//        solDescription = solDescriptions[sol+1]
+//    }
     
     // UICollectionViewDataSource/Delegate
     
@@ -149,8 +170,8 @@ class PhotosCollectionViewController: UIViewController, UICollectionViewDataSour
             defer { self.operations.removeValue(forKey: photoReference.id) }
             
             if let currentIndexPath = self.collectionView?.indexPath(for: cell),
-                currentIndexPath == indexPath {
-                return // Cell has been reused
+                currentIndexPath != indexPath {
+                return
             }
             
             if let data = fetchOp.imageData {
@@ -177,7 +198,7 @@ class PhotosCollectionViewController: UIViewController, UICollectionViewDataSour
     
     private var roverInfo: MarsRover? {
         didSet {
-            solDescription = roverInfo?.solDescriptions[10]
+            solDescription = roverInfo?.solDescriptions [10] // TODO: Check if it has the right images and set index correctly, not something in the middle
         }
     }
     private var solDescription: SolDescription? {
